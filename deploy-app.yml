@@ -1,0 +1,52 @@
+# Create a GitHub action to email a report from a file at 6 a.m. daily.
+name: Email Report
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+
+jobs:
+  email_report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Email report
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.EMAIL }}
+          password: ${{ secrets.PASSWORD }}
+          subject: Daily Report
+          body: |
+            Good morning! Here is the report for today.
+          to: ${{ secrets.RECIPIENT }}
+          attachments: deploy-report.txt
+
+      - name: Delete report
+        run: rm deploy-report.txt
+
+      - name: Commit changes
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "GitHub Actions"
+          git add .
+          git commit -m "Add email report"
+          git push
+ 
+ In this workflow: 
+ 
+ The action runs on a schedule at 6 a.m. daily. 
+ The  dawidd6/action-send-mail@v3  action sends an email with the report. 
+ The email uses the Gmail SMTP server, and the GitHub secrets  EMAIL ,  PASSWORD , and  RECIPIENT  store the email address, password, and recipient email address, respectively. 
+ The email has a subject line, body, and an attachment named  deploy-report.txt . 
+ The action deletes the report after sending it. 
+ The action commits the changes and pushes them to the repository. 
+ 
+ Summary 
+ GitHub Actions automate tasks in your repository, such as testing, building, and deploying code. You can create workflows by defining triggers, jobs, and steps in a YAML file. 
+ This tutorial discussed the basic structure of a GitHub Actions workflow and explained how to create a workflow to deploy an application. It also showed how to create a workflow to send an email report daily. 
+ Now you can create GitHub Actions workflows to automate tasks in your repositories. 
+ If you work with Git, you might be interested in checking out our  Git Cheat Sheet.
